@@ -1,142 +1,73 @@
- [![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/iris-fhir-template)
- [![Quality Gate Status](https://community.objectscriptquality.com/api/project_badges/measure?project=intersystems_iris_community%2Firis-fhir-template&metric=alert_status)](https://community.objectscriptquality.com/dashboard?id=intersystems_iris_community%2Firis-fhir-template)
- [![Reliability Rating](https://community.objectscriptquality.com/api/project_badges/measure?project=intersystems_iris_community%2Firis-fhir-template&metric=reliability_rating)](https://community.objectscriptquality.com/dashboard?id=intersystems_iris_community%2Firis-fhir-template)
-# iris-fhirserver-template
-This is the base template for using InterSystems IRIS for Health Community Edition as a FHIR Server
+# FHIR-CHATGPT Application: A Virtual Healthcare Assistant
 
-It setups a FHIR SERVER, imports the test data, demoes REST API usage with a simple web page.
+The FHIR-CHATGPT application is a virtual healthcare assistant that leverages the power of FHIR (Fast Healthcare Interoperability Resources) to seamlessly retrieve patient data from the Intersystems IRIS database. By analyzing this data and utilizing its vast knowledge base, FHIR-CHATGPT assists both patients and medical professionals in various healthcare-related tasks.
+
+FHIR-CHATGPT is designed to facilitate efficient and personalized healthcare interactions by providing accurate and relevant information. Leveraging the FHIR standard ensures interoperability, allowing the application to retrieve comprehensive patient data from the Intersystems IRIS database. This data includes medical records, treatment history, laboratory results, and other relevant information required for comprehensive healthcare support.
+
+Using its advanced natural language processing capabilities, FHIR-CHATGPT can understand and interpret patient queries and provide appropriate responses. The application can assist patients by answering questions regarding symptoms, medications, treatment options, and general healthcare advice. FHIR-CHATGPT also assists healthcare professionals by presenting relevant patient information, suggesting potential diagnoses, and providing evidence-based recommendations for treatment plans.
+
+FHIR-CHATGPT benefits from its vast knowledge base, which includes a wide range of medical literature, clinical guidelines, and research findings. This knowledge allows the application to offer reliable and up-to-date information, contributing to the overall quality of patient care and medical decision-making.
+
+By harnessing the power of FHIR and incorporating artificial intelligence, FHIR-CHATGPT aims to bridge the gap between patients and healthcare professionals, providing timely and accurate support. This virtual healthcare assistant has the potential to improve healthcare outcomes, enhance patient satisfaction, and streamline the delivery of healthcare services.
+
+In conclusion, the FHIR-CHATGPT application is an innovative virtual healthcare assistant that utilizes FHIR and AI technologies to provide comprehensive and personalized healthcare support. By leveraging patient data from the Intersystems IRIS database and utilizing its extensive knowledge base, FHIR-CHATGPT assists both patients and medical professionals in navigating the complexities of healthcare, ultimately improving the overall quality of care provided.
 
 ## Prerequisites
-Make sure you have [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Docker desktop](https://www.docker.com/products/docker-desktop) installed.
+Make sure you have : 
+- [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+- [Docker desktop](https://www.docker.com/products/docker-desktop).
+- [openai api key](https://platform.openai.com/account/api-keys).
 
 ## Installation 
-
-### IPM
-
-Open IRIS for Health installation with IPM client installed. Call in any namespace:
-
-```
-USER>zpm "install fhir-server"
-```
-
-This will install FHIR server in FHIRSERVER namespace.
-
-Or call the following for installing programmatically:
-```
-set sc=$zpm("install fhir-server")
-```
-
-
-### Docker (e.g. for dev purposes)
 
 Clone/git pull the repo into any local directory
 
 ```
-$ git clone https://github.com/intersystems-community/iris-fhir-template.git
+$ git clone https://github.com/Davi-Massaru/fhir-chatGPT.git
+```
+
+Replace a <OPENIA.key> tag to your openia api key on iris.script
+
+```
+Set ^GPT.openAI.APIKeys = "<OPENIA.key>"
+```
+
+
+You can change a GPT.model, change the iris.script. defined "gpt-3.5-turbo-0613"
+
+```
+Set ^GPT.model = "gpt-3.5-turbo-0613"
 ```
 
 Open the terminal in this directory and run:
 
 ```
-$ docker-compose up -d
+$ docker-compose build && docker-compose up -d
 ```
 
-## Patient data
-The template goes with 5 preloaded patents in [/data/fhir](https://github.com/intersystems-community/iris-fhir-server-template/tree/master/data/fhir) folder which are being loaded during [docker build](https://github.com/intersystems-community/iris-fhir-server-template/blob/8bd2932b34468f14530a53d3ab5125f9077696bb/iris.script#L26)
-You can generate more patients doing the following. Open shel terminal in repository folder and call:
-```
-#./synthea-loader.sh 10
-```
-this will create 10 more patients in data/fhir folder.
-Then open IRIS terminal in FHIRSERVER namespace with the following command:
-```
-docker-compose exec iris iris session iris -U FHIRServer
-```
-and call the loader method:
-```
-FHIRSERVER>d ##class(fhirtemplate.Setup).LoadPatientData("/irisdev/app/output/fhir","FHIRSERVER","/fhir/r4")
-```
+## Functioning of FHIR-CHATGPT
 
- with using the [following project](https://github.com/intersystems-community/irisdemo-base-synthea)
+FHIR-CHATGPT utilizes the ChatGPT language model, configured with specific rules for the context of FHIR analysis and engineering. These rules are defined in the `text_prompt/prompt-analysis-fhir-engineer.txt` file.
 
-## Testing FHIR R4 API
+When FHIR-CHATGPT receives the patient ID, it queries the Intersystems IRIS database, loading all the FHIR data from the patient's history. This data includes information about medical conditions, medications, allergies, test results, and other relevant aspects of the patient's health.
 
-Open URL http://localhost:32783/fhir/r4/metadata
-you should see the output of fhir resources on this server
+Users can ask questions to Chat GPT related to health and the patient's history. The FHIR-CHATGPT language model has been trained to behave as a virtual healthcare assistant and responds based on the available FHIR data. Chat GPT utilizes its general knowledge and the specific context of the patient to provide relevant and helpful answers.
 
-## Testing Postman calls
-Get fhir resources metadata
-GET call for http://localhost:32783/fhir/r4/metadata
-<img width="881" alt="Screenshot 2020-08-07 at 17 42 04" src="https://user-images.githubusercontent.com/2781759/89657453-c7cdac00-d8d5-11ea-8fed-71fa8447cc45.png">
+Upon receiving a question, FHIR-CHATGPT analyzes the text and utilizes the knowledge present in its training to generate an appropriate response. This response may include information about symptoms, treatments, medications, general health guidance, or other health-related information.
 
+It is important to note that FHIR-CHATGPT does not replace professional medical consultation. It provides information based on the available data and general knowledge, but it is always recommended to seek guidance from a qualified healthcare professional for personalized medical diagnosis, treatment, and advice.
 
-Open Postman and make a GET call for the preloaded Patient:
-http://localhost:32783/fhir/r4/Patient/1
-<img width="884" alt="Screenshot 2020-08-07 at 17 42 26" src="https://user-images.githubusercontent.com/2781759/89657252-71606d80-d8d5-11ea-957f-041dbceffdc8.png">
-
+Through the combination of natural language technology and the FHIR framework, FHIR-CHATGPT aims to provide comprehensive virtual support and assist both patients and healthcare professionals in accessing relevant and reliable information.
 
 ## Testing FHIR API calls in simple frontend APP
 
-the very basic frontend app with search and get calls to Patient and Observation FHIR resources could be found here:
-http://localhost:32783/fhirUI/FHIRAppDemo.html
-or from VSCode ObjectScript menu:
+the very basic front-end application enables interactions with the
+FHIR-CHAT : http://localhost:32783/fhirUI/FHIRAppDemo.html or from VSCode ObjectScript menu:
+
 <img width="616" alt="Screenshot 2020-08-07 at 17 34 49" src="https://user-images.githubusercontent.com/2781759/89657546-ea5fc500-d8d5-11ea-97ed-6fbbf84da655.png">
 
-While open the page you will see search result for female anemic patients and graphs a selected patient's hemoglobin values:
-<img width="484" alt="Screenshot 2020-08-06 at 18 51 22" src="https://user-images.githubusercontent.com/2781759/89657718-2b57d980-d8d6-11ea-800f-d09dfb48f8bc.png">
+Is possible call a CHAT by command line. call ##class(engineer.ChatGPT).generate(command,PatientID,"analysis-fhir")
 
-
-## Development Resources
-[InterSystems IRIS FHIR Documentation](https://docs.intersystems.com/irisforhealth20203/csp/docbook/Doc.View.cls?KEY=HXFHIR)
-[FHIR API](http://hl7.org/fhir/resourcelist.html)
-[Developer Community FHIR section](https://community.intersystems.com/tags/fhir)
-
-
-
-## How to start development
-This repository is ready to code in VSCode with ObjectScript plugin.
-Install [VSCode](https://code.visualstudio.com/), [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker) and [ObjectScript](https://marketplace.visualstudio.com/items?itemName=daimor.vscode-objectscript) plugin and open the folder in VSCode.
-Open /src/cls/PackageSample/ObjectScript.cls class and try to make changes - it will be compiled in running IRIS docker container.
-![docker_compose](https://user-images.githubusercontent.com/2781759/76656929-0f2e5700-6547-11ea-9cc9-486a5641c51d.gif)
-
-Feel free to delete PackageSample folder and place your ObjectScript classes in a form
-/src/Package/Classname.cls
-[Read more about folder setup for InterSystems ObjectScript](https://community.intersystems.com/post/simplified-objectscript-source-folder-structure-package-manager)
-
-The script in Installer.cls will import everything you place under /src into IRIS.
-
-
-## What's inside the repository
-
-### Dockerfile
-
-The simplest dockerfile which starts IRIS and imports Installer.cls and then runs the Installer.setup method, which creates IRISAPP Namespace and imports ObjectScript code from /src folder into it.
-Use the related docker-compose.yml to easily setup additional parametes like port number and where you map keys and host folders.
-Use .env/ file to adjust the dockerfile being used in docker-compose.
-
-
-### .vscode/settings.json
-
-Settings file to let you immedietly code in VSCode with [VSCode ObjectScript plugin](https://marketplace.visualstudio.com/items?itemName=daimor.vscode-objectscript))
-
-### .vscode/launch.json
-Config file if you want to debug with VSCode ObjectScript
-
-
-## Troubleshooting
-**ERROR #5001: Error -28 Creating Directory /usr/irissys/mgr/FHIRSERVER/**
-If you see this error it probably means that you ran out of space in docker.
-you can clean up it with the following command:
 ```
-docker system prune -f
+zw ##class(engineer.ChatGPT).generate("analyze my vital-signs","1","analysis-fhir")
 ```
-And then start rebuilding image without using cache:
-```
-docker-compose build --no-cache
-```
-and start the container with:
-```
-docker-compose up -d
-```
-
-This and other helpful commands you can find in [dev.md](https://github.com/intersystems-community/iris-fhir-template/blob/cd7e0111ff94dcac82377a2aa7df0ce5e0571b5a/dev.md)
