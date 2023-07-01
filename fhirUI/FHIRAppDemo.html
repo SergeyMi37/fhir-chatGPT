@@ -1,134 +1,82 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <title>Simple Chat</title>
+  <style>
+    .chat-container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-family: Arial, sans-serif;
+    }
+    .chat-container .message {
+      margin-bottom: 10px;
+    }
+    .chat-container .user-message {
+      background-color: #d3f1ff;
+    }
+    .chat-container .bot-message {
+      background-color: #f7f7f7;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="message user-message">
+      <strong>You:</strong> Hello, how are you?
+    </div>
+    <div class="message bot-message">
+      <strong>ChatBot:</strong> Hello! How can I assist you?
+    </div>
+    <!-- Add more messages here as needed -->
+    <form id="chat-form">
+      <input type="text" id="patient-id-input" placeholder="Enter Patient ID" /> <br/>
+      <input type="text" id="user-input" placeholder="Type your message..." />
+      <button type="submit">Send</button>
+    </form>
+  </div>
 
-  <head>
-    <title>GS2019 FHIR App</title>
-	<script src="jquery-3.4.1.min.js"></script>
-	<script src="jqFhir.js"></script>
-	<script src="plotly-latest.min.js"></script>
-	<style> 
-	  body {
-	    font: 12pt/2em sans-serif;
-		margin: 3em;
-	  }
-	  table, th, td {
-	    border: 1px solid black;
-		text-align: left;
-		text-indent: 10px;
-	  }
-	</style>
-  </head>
+  <script>
+    document.getElementById('chat-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const patientId = document.getElementById('patient-id-input').value;
+      const userInput = document.getElementById('user-input').value;
+      document.getElementById('user-input').value = '';
 
-  <body>  
-    <h3>Patients with Anemia</h3>
-	<table id="table" style="width:500px">
-	  <thead>
-        <tr>
-          <th>Name</th>
-          <th>ID</th>
-        </tr>
-      </thead>
-    </table>
-	<br>
-	<div>Patient ID: <input type="text" id="input"> <input type="button" onclick="plotValues()" value="Submit"></div>
-	<h3>Hemoglobin in Blood (g/dL)</h3>
-	<div id="chart" style="width:600px;height:400px;"></div>
-	
-	<script>
-      var patientTable = document.getElementById("table");
-      var inputBox = document.getElementById("input");
-	  var chartDiv = document.getElementById("chart");
-	  
-	  // Instantiate a new FHIR client
-	  var client = fhir({ 
-		baseUrl: '/fhir/r4',
-		
-		headers: {
-		  'Accept': 'application/fhir+json',
-		  'Content-Type': 'application/fhir+json;charset=UTF-8'
-		}
-	  });
-	  
-	  // Perform a search to retrieve anemic patients
-	  client.search({
-	    type:'Patient', 
-		query: {
-		
-          gender:'female',
-          '_has:Condition:patient:code':'271737000',
-		  birthdate:'le1993',
-		  _sort:'-birthdate',
-		  _count: 5
-				
-		}}).then( function(patients) {
-		  (patients.data.entry || []).forEach( function(patient) {    
-			var row = patientTable.insertRow();
-			var nameCell  = row.insertCell(0);
-		    var idCell  = row.insertCell(1);
-			
-			nameCell.innerHTML = getName(patient.resource);
-			idCell.innerHTML = patient.resource.id;
-		  });
-	  });
+      const userMessage = document.createElement('div');
+      userMessage.classList.add('message', 'user-message');
+      userMessage.innerHTML = `<strong>You:</strong> ${userInput}`;
 
-	  // Function for plotting observation values on a chart. Gets invoked when Submit is clicked.
-	  function plotValues() {
-	    var patientId = inputBox.value;
-	
-		// Perform a search to retrieve all hemoglobin measurements for a given patient
-		client.search({
-		  type:'Observation', 
-		  query: {
-		  
-			patient: patientId, 
-			code: "718-7", // LOINC code for Hemoglobin in Blood (g/dL)
-			_sort: "date"
-			
-		  }}).then( function(observations) {
-		  
-            var dates = [];
-            var values = []; 
-                    
-			(observations.data.entry || []).forEach( function(observation) {
-              var date = observation.resource.effectiveDateTime;
-              var value = observation.resource.valueQuantity && observation.resource.valueQuantity.value;
-              if (date && value && dates.indexOf(date) == -1) {
-                dates.push(date);
-                values.push(value);
-              };
-            });
+      document.querySelector('.chat-container').appendChild(userMessage);
 
-            Plotly.newPlot(chartDiv, {
-              data: [{
-                x: dates,
-                y: values,
-                type: "scatter"
-              }],
-              layout: {
-                xaxis: {type: "date", tickformat: "%b %Y"},
-                yaxis: {range: [5,20]} // range from 5g/dL to 20g/dL
-              },
-              config: {
-                displayModeBar: false
-              }
-            });          
-          });
-	  }
-	
-	  // Helper function for extracting a patient's full name from a Patient resource 	
-  	  function getName(resource) {
-	    let name = '';
-	    if (resource.name && resource.name.length > 0) {
-	      if (resource.name[0].given && resource.name[0].given.length > 0) {
-	        name += `${resource.name[0].given[0]} `;
-	      }
-	      if (resource.name[0].family) {
-	        name += resource.name[0].family;
-	      }  
-	    }
-	    return name;
-	  }
+      // Make an API call to the engineer/ChatGPT endpoint to retrieve the bot response
+      fetch('/api/chat/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          patientId: patientId,
+          userInput: userInput,
+        }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          // Handle the received response from ChatGPT
+          const botResponse = data.botResponse;
 
-    </script>
-  </body>
+          const botMessage = document.createElement('div');
+          botMessage.classList.add('message', 'bot-message');
+          botMessage.innerHTML = `<strong>ChatBot:</strong> ${botResponse}`;
+
+          document.querySelector('.chat-container').appendChild(botMessage);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    });
+  </script>
+</body>
 </html>
