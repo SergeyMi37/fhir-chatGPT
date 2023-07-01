@@ -61,6 +61,8 @@ Through the combination of natural language technology and the FHIR framework, F
 
 ## Testing FHIR API calls in simple frontend APP
 
+<img src="https://raw.githubusercontent.com/Davi-Massaru/fhir-chatGPT/main/chat.png"></img>
+
 the very basic front-end application enables interactions with the
 FHIR-CHAT : http://localhost:32783/fhirUI/FHIRAppDemo.html or from VSCode ObjectScript menu:
 
