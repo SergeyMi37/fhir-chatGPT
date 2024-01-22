@@ -4,8 +4,10 @@
     Set ^GPT.openAI.APIKeys = "<OPENIA.key>"
     Set ^GPT.engine("analysis-fhir") = "/home/irisowner/irisdev/prompt-analysis-fhir-engineer.txt"
     Set ^GPT.engine.initial("analysis-fhir") = "analysis the FHIR structure and answer me:"
+
+    zpm "load https://github.com/diashenrique/iris-fhir-portal.git"
     zpm "load /home/irisowner/irisdev/ -v":1:1
-    zpm "install fhir-portal"
+    ;zpm "install fhir-portal"
     
     halt
     /// the below is not important anymore. 
